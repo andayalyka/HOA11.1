@@ -1,0 +1,29 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+
+  - name: Install Docker
+    package:
+      name: docker.io
+      state: present
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Enable Docker
+    service:
+      name: docker
+      enabled: yes
+      state: started
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Add user to docker group
+    user:
+      name: $USER
+      groups: docker
+      append: yes
+
+  - name: Build Docker image
+    docker_image:
+      name: web_and_db_server
+      path: /path/to/Dockerfile
+      state: present1
