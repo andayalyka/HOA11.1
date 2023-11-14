@@ -7,3 +7,5 @@ COPY . /var/www/html
 EXPOSE 80 3306
 
 CMD ["nginx", "-g", "daemon off;"]
+
+

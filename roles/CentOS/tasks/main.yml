@@ -1,0 +1,40 @@
+
+  - name: Install Docker
+    yum:
+      name: docker
+      state: present
+
+  - name: Start Docker
+    service:
+      name: docker
+      enabled: yes
+      state: started
+
+  - name: Create docker group
+    group:
+      name: docker
+      state: present
+
+  - name: Add user to docker group
+    user:
+      name: "{{ ansible_user }}"
+      groups: docker
+      append: yes
+
+  - name: Create build directory
+    file:
+      path: build
+      state: directory
+
+  - name: Copy Dockerfile to build directory
+    copy:
+      src: docker.file
+      dest: build
+
+  - name: Build Docker image
+    docker_image:
+      name: web_and_db_server
+      path: /path/to/Dockerfile
+      state: present
+      source: buildo
+

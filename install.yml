@@ -1,31 +1,28 @@
 ---
 - hosts: all
-  become: yes
-  tasks:
+  become: true
+  pre_tasks:
 
-  - name: Install Docker
-    package:
-      name: docker.io
-      state: present
+  - name: Update repository Index (CentOS)
+    tags: always
+    yum:
+      update_cache: yes
+    changed_when: false
+    when: ansible_distribution == "CentOS"
+
+  - name: Install Updates (Ubuntu)
+    tags: always
+    apt:
+      update_cache: yes
+    changed_when: false
     when: ansible_distribution == "Ubuntu"
 
-  - name: Enable Docker
-    service:
-      name: docker
-      enabled: yes
-      state: started
-    when: ansible_distribution == "Ubuntu"
+- hosts: Ubuntu
+  become: true
+  roles:
+    - Ubuntu 
 
-  - name: Add user to docker group
-    user:
-      name: andayalyka
-      groups: docker
-      append: yes
-    when: ansible_distribution == "Ubuntu"
-
-  - name: Build Docker image
-    docker_image:
-      name: web_and_db_server
-      path: /path/to/Dockerfile
-      state: present
-    when: ansible_distrubution == "Ubuntu"
+- hosts: CentOS
+  become: true
+  roles:
+    - CentOS

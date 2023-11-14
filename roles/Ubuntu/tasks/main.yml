@@ -1,0 +1,63 @@
+
+    # Install additional / update current packages needed for Docker
+    - name: Install Docker and dependencies
+      apt:
+        name:
+          - docker.io
+          - ca-certificates
+          - curl
+          - apt-transport-https
+          - software-properties-common
+          - gnupg2
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+    # Add an APT repository key for Docker
+    - name: Add Docker APT repository key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+      when: ansible_distribution == "Ubuntu"
+
+    # Add an APT repository for the key of Docker
+    - name: Add Docker APT repository
+      apt_repository:
+        repo: "deb https://download.docker.com/linux/ubuntu focal stable"
+        state: present
+      when: ansible_distribution == "Ubuntu"
+
+    # Install Docker
+    - name: Install Docker
+      apt:
+        name: docker
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+    # Start the Docker service
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+      when: ansible_distribution == "Ubuntu"
+
+    # Create build directory
+    - name: Create build directory
+      file:
+        path: build
+        state: directory
+
+    # Copy Dockerfile to build directory
+    - name: Copy Dockerfile to build directory
+      copy:
+        src: ./Dockerfile
+        dest: build
+
+    # Build Docker image
+    - name: Build Docker image
+      docker_image:
+        name: web_and_db_server
+        path: build/Dockerfile
+        state: present
+        source: build
+
